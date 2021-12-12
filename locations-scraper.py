@@ -24,8 +24,12 @@ data = {}
 states = soup.find_all("a", class_="ga_w2gi_lp")
 for state in states:
     # print(state, end="\n"*2)
-    data[state] = []
-    
+
+    if state.text == "Home" or state.text == "Store Locator":
+        continue
+
+    data[state.text] = []
+
     # Get link to state page
     pageOfCities = requests.get(state["href"])
     citySoup = BeautifulSoup(pageOfCities.content, "html.parser")
@@ -52,8 +56,11 @@ for state in states:
             name = store.contents[1].text
             address = "{}, {}, {} {}".format(store.contents[4].contents[1].text, store.contents[4].contents[4].text, store.contents[4].contents[6].text, store.contents[4].contents[8].text)
 
-            data[state].append({
+            data[state.text].append({
                 "name": name,
                 "address": address,
                 "base": 1.00
             })
+
+with open('stores.json', 'w') as outfile:
+    json.dump(data, outfile)
