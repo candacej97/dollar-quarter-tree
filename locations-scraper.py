@@ -12,12 +12,17 @@ from bs4 import BeautifulSoup
 import json
 
 URL = "https://dollartree.com/locations"
-page = requests.get(URL)
+page = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'})
 
 # MUST encode, or else it won't output
 # print(page.text.encode('utf-8'))
 
 soup = BeautifulSoup(page.content, "html.parser")
+
+# Error handling?
+if page.status_code >= 400:
+    exit("ERROR: Page request is unresponsive\nStatus Code: {}".format(page.status_code))
+
 data = {}
 
 # Find, loop through, and print each state (class=ga_w2gi_lp) 
@@ -31,7 +36,7 @@ for state in states:
     data[state.text] = []
 
     # Get link to state page
-    pageOfCities = requests.get(state["href"])
+    pageOfCities = requests.get(state["href"], headers={'User-Agent': 'Mozilla/5.0'})
     citySoup = BeautifulSoup(pageOfCities.content, "html.parser")
 
     # Find, loop through, and print each city (class=ga_w2gi_lp) 
@@ -40,7 +45,7 @@ for state in states:
         # print(city, end="\n"*2)
 
         # Get link to city page
-        pageOfStores = requests.get(city["href"])
+        pageOfStores = requests.get(city["href"], headers={'User-Agent': 'Mozilla/5.0'})
         storesSoup = BeautifulSoup(pageOfStores.content, "html.parser")
 
         # Find, loop through, and print each store (class="schemastore")
